@@ -2,14 +2,19 @@ version: '3.8'
 
 services:
 
-  web:
-    build: ./app
+  auth:
+    build: ./auth
     restart: always
-    command: uvicorn main:app --host 0.0.0.0
+    command: uvicorn auth.main:app --host 0.0.0.0
+    ports:
+      - 8188:8000
+
+  data_grip:
+    build: ./data_grip
+    restart: always
+    command: uvicorn data_grip.main:app --host 0.0.0.0
     ports:
       - 8180:8000
-    depends_on:
-      - db
   # db:
   #   restart: always
   #   image: postgres:11.11
