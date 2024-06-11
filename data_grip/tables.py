@@ -4,7 +4,7 @@ class Table:
 
     def __init__(self, filename):  
         self.df = pandas.read_excel(filename)
-        self.df = self.df.head()
+        self.df = self.df.head(20)
         print(self.df)
     # def display_count(self):  
     def get_rows(self):
