@@ -2,7 +2,7 @@ from typing import Union, Any
 from datetime import datetime
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from .utils import (
+from utils import (
     ALGORITHM,
     JWT_SECRET_KEY,
     JWT_REFRESH_SECRET_KEY
@@ -10,8 +10,8 @@ from .utils import (
 
 from jose import jwt
 from pydantic import ValidationError
-from auth.schemas import TokenPayload, SystemUser
-import auth.db
+from schemas import TokenPayload, SystemUser
+import db
 # from replit import db
 
 reuseable_oauth = OAuth2PasswordBearer(
@@ -52,7 +52,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    user = auth.db.get_user(token_data.sub).as_dict()
+    user = db.get_user(token_data.sub).as_dict()
     
     if user is None:
         raise HTTPException(
