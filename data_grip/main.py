@@ -3,13 +3,13 @@ import uvicorn
 from fastapi import FastAPI, File, UploadFile, status, Header, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from data_grip.tables import Table
+from tables import Table
 from pydantic import BaseModel
 from typing import Union, List, Optional
 
 app = FastAPI()
 
-tb = Table("data_grip\low_data.xlsx")
+tb = Table("low_data.xlsx")
 
 origins = [
     "*",
