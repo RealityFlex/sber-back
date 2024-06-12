@@ -1,0 +1,9 @@
+{{define "Endpoint"}}
+
+{{$service := .}}
+
+{{ template "Prod" $service.productapi }},
+{{ template "DataGrip" $service.datagrip }}
+
+{{end}}
+view rawEndpoint.tmpl hos

@@ -1,0 +1,243 @@
+{{define "DataGrip"}}
+
+{{$host := .}}
+
+{ 
+    "endpoint": "/docs",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/docs",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/openapi.json",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/openapi.json",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/get_rows",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/get_rows",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/get_table",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/get_table",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/filter",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/filter",
+        "method": "POST"
+        }
+    ]
+},
+{ 
+    "endpoint": "/load_table",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/load_table",
+        "method": "POST"
+        }
+    ]
+},
+{ 
+    "endpoint": "/list_files",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/list_files",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/add_config",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/add_config",
+        "method": "POST"
+        }
+    ]
+},
+{ 
+    "endpoint": "/history",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/history",
+        "method": "GET"
+        }
+    ]
+}
+,
+{ 
+    "endpoint": "/delete_table",
+    "method": "DELETE",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/delete_table",
+        "method": "DELETE"
+        }
+    ]
+}
+
+{{end}}
