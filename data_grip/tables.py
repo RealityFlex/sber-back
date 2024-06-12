@@ -10,7 +10,7 @@ class Table:
         print(self.df)
     # def display_count(self):  
     def get_rows(self, sub, df_name):
-        if len(mini.list_files('user-tabels',f'{sub}/{df_name}')) == 0: 
+        if len(mini.list_files('user-tabels',sub,df_name)) == 0: 
             return self.df.dtypes.astype(str).to_dict()
         else:
             tt = read_data.get_df(sub, df_name)
@@ -87,7 +87,7 @@ class Table:
 
         for operation in data:
             df = self.apply_operation(df, dict(operation))
-            
+
         start_idx = pg * n
         end_idx = start_idx + n
         print(n, pg, start_idx, end_idx)
