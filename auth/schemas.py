@@ -17,7 +17,7 @@ class UserAuth(BaseModel):
     
 
 class UserOut(BaseModel):
-    id: int
+    id: UUID
     email: str
 
 

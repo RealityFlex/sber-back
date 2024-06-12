@@ -1,14 +1,22 @@
-from fastapi import FastAPI, status, HTTPException, Depends
+from fastapi import FastAPI, status, HTTPException, Depends, Body, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from schemas import UserOut, UserAuth, TokenSchema, SystemUser
-import db
+import db_w as db
+import json
+from fastapi import FastAPI, Header
+from typing_extensions import Annotated
+from typing import List, Union
+
+HeaderParameter = Annotated[Union[str, None], Header()]
+
 # from replit import db
 from utils import (
     get_hashed_password,
     create_access_token,
     create_refresh_token,
-    verify_password
+    verify_password,
+    PUBLIC_KEY
 )
 from uuid import uuid4
 from deps import get_current_user, refresh_current_user
@@ -19,15 +27,13 @@ app = FastAPI()
 async def docs():
     return RedirectResponse(url='/docs')
 
-@app.get("/ttt")
-async def ttt():
-    db.add_new_user(username="asd", token="asd", token_password="asddd")
-    return 
-
+@app.get("/jwk")
+def get_jwk():
+    return {"keys": [json.loads(PUBLIC_KEY)]}
 
 @app.post('/signup', summary="Create new user", response_model=UserOut)
 async def create_user(data: UserAuth):
-    user = db.get_user(data.email).as_dict()
+    user = db.get_user(data.email)
     if user is not None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -44,12 +50,13 @@ async def create_user(data: UserAuth):
 
 @app.post('/login', summary="Create access and refresh tokens for user", response_model=TokenSchema)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = db.get_user(form_data.username).as_dict()
+    user = db.get_user(form_data.username)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password"
         )
+    user = user.as_dict()
     hashed_pass = user['token_password']
     if not verify_password(form_data.password, hashed_pass):
         raise HTTPException(
@@ -68,9 +75,10 @@ async def get_me(user: SystemUser = Depends(get_current_user)):
 
 @app.get('/refresh', summary="Refresh tokens for user", response_model=TokenSchema)
 async def refresh_me(user: SystemUser = Depends(refresh_current_user)):
-    user = db.get_user(user['email']).as_dict()
+    user = db.get_user(user['email'])
     if user != None:
-         return {
+        user = user.as_dict()
+        return {
         "access_token": create_access_token(user['username']),
         "refresh_token": create_refresh_token(user['username']),
     }
