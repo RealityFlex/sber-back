@@ -10,15 +10,15 @@ class Table:
         print(self.df)
     # def display_count(self):  
     def get_rows(self, sub, df_name):
+        df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0: 
-            return self.df.dtypes.astype(str).to_dict()
+            df = self.df
         else:
-            tt = read_data.get_df(sub, df_name)
-            if tt == None:
-                tt = read_data.load_df(sub, df_name)
-                return tt.dtypes.astype(str).to_dict()
-            else:
-                return tt.dtypes.astype(str).to_dict()
+            df = read_data.get_df(sub, df_name)
+            if df.empty:
+                df = read_data.load_df(sub, df_name)
+                
+        return df.dtypes.astype(str).to_dict()
     
     def get_table(self, sub, df_name, n=10, pg=0):
         df = pd.DataFrame()
