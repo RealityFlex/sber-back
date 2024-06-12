@@ -12,10 +12,16 @@ services:
   data_grip:
     build: ./data_grip
     restart: always
-    command: uvicorn main:app --hos 0.0.0.0
+    command: uvicorn main:app --host 0.0.0.0
     ports:
       - 8180:8000
 
+  krakend:
+    container_name: krakend
+    build: ./krakend 
+    restart: always
+    ports:
+      - "8190:8090"
   # db:
   #   restart: always
   #   image: postgres:11.11

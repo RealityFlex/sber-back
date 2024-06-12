@@ -1,0 +1,4 @@
+{
+    "productapi": "http://auth:8001",
+    "datagrip": "http://data_grip:8000"
+}

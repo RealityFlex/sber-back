@@ -1,0 +1,14 @@
+{
+    "$schema": "https://www.krakend.io/schema/krakend.json",
+    "version": 3,
+    "timeout": "100s",  
+    "cache_ttl": "300s",
+    "name": "KrakenD - API Gateway",
+    "port": 8090,
+    "extra_config": {
+      "router": {
+        "return_error_msg": true
+      }
+    },
+      "endpoints":[{{ template "Endpoint" .service  }}]
+}
