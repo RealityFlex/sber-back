@@ -33,18 +33,18 @@ def get_jwk():
 
 @app.post('/signup', summary="Create new user", response_model=UserOut)
 async def create_user(data: UserAuth):
-    user = db.get_user(data.email)
+    user = db.get_user(data.username)
     if user is not None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exist"
         )
     user = {
-        'email': data.email,
+        'username': data.username,
         'password': get_hashed_password(data.password),
         'id': str(uuid4())
     }
-    db.add_new_user(username=user['email'], token_password=user['password'])    # saving user to database
+    db.add_new_user(username=user['username'], token_password=user['password'])    # saving user to database
     return user
 
 
@@ -73,9 +73,21 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def get_me(user: SystemUser = Depends(get_current_user)):
     return user
 
+@app.post('/add_config', summary='Get history of currently logged in user')
+async def add_config(user: SystemUser = Depends(get_current_user), data = Body()):
+    conf = db.add_new_configuration(user['id'], data)
+    return conf
+
+@app.get('/history', summary='Get history of currently logged in user')
+async def get_history(user: SystemUser = Depends(get_current_user)):
+    conf = db.get_user_configurations(user['id'])
+    if conf == None:
+         pass
+    return conf
+
 @app.get('/refresh', summary="Refresh tokens for user", response_model=TokenSchema)
 async def refresh_me(user: SystemUser = Depends(refresh_current_user)):
-    user = db.get_user(user['email'])
+    user = db.get_user(user['username'])
     if user != None:
         user = user.as_dict()
         return {

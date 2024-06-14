@@ -61,4 +61,4 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
             detail="Could not find user",
         )
     user = user.as_dict()
-    return {"id":user['id'], "email":user['username'], "password":user['token_password']}
+    return {"id":user['id'], "username":user['username'], "password":user['token_password']}
