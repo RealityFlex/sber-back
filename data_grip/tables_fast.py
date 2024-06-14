@@ -1,14 +1,16 @@
 import pandas as pd
 import mini
-import read_data
+import read_data_fast as read_data
 import os
+import asyncio
 
 class Table:  
 
-    def __init__(self, filename):  
-        self.df = pd.read_excel(mini.presigned_get_object('hardcoded','low_data.xlsx'))
-        self.df = self.df.head(20)
-        print(self.df)
+    def __init__(self):
+
+        # self.base_df = read_data.load_df(sub, df_name)
+
+        print("Tables starting")
     # def display_count(self):  
     def get_rows(self, sub, df_name):
         df = pd.DataFrame()
@@ -89,20 +91,15 @@ class Table:
         
         return df
 
-    def use_filter(self, data, sub, df_name, n, pg):
-        df = pd.DataFrame()
-        if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df.copy()
-        else:
-            df = read_data.get_df(sub, df_name)
-            print("<<<")
-            if df.empty:
-                print(">>>")
-                df = read_data.load_df(sub, df_name)
+    async def use_filter(self, data, sub,  df_name='filter', df_real=None):
+        df = df_real
 
         for operation in data:
             df = self.apply_operation(df, dict(operation))
         
+        read_data.set_df(sub, df_name, df)
+        asyncio.create_task(read_data.save_df_to_minio(sub, df_name, df))
+        return "data_saved"
         # start_idx = pg * n
         # end_idx = start_idx + n
         # print(n, pg, start_idx, end_idx)
