@@ -57,6 +57,20 @@
         }
     ]
 }
+{ 
+    "endpoint": "/api/auth/refresh",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/refresh",
+        "method": "GET"
+        }
+    ]
+}
 
 
 
