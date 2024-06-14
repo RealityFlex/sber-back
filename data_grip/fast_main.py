@@ -11,7 +11,7 @@ from typing import Union, List, Optional, Annotated
 import json
 import read_data_fast as read_data
 import asyncio
-# import db_w as db
+import db_w as db
 # import pandas as pd
 from tasks import celery_use_filter, celery_get_rows, celery_get_table, get_res
 HeaderParameter = Annotated[Union[str, None], Header()]
@@ -154,8 +154,12 @@ async def getT(exp: HeaderParameter, sub: HeaderParameter, n:int=10, pg:int=0, d
     asyncio.create_task(load_data(sub, df_name))
     return {"message": "Загрузка данных началась"}
 
+@app.get("/list_files")
+async def list_files(exp: HeaderParameter, sub: HeaderParameter, df_name='bills'):
+    return await read_data.get_list_files(sub,df_name)
+
 @app.post("/filter")
-async def filterR(exp: HeaderParameter, sub: HeaderParameter, data: List[Value], df_name='bills'):
+async def filterR(exp: HeaderParameter, sub: HeaderParameter, data: List[Value], df_name='filter'):
     read_data.add_user(exp, sub)
     asyncio.create_task(tb.use_filter(data=jsonable_encoder(data), sub=sub, 
                                         df_name=df_name, df_real=read_data.get_df(sub, df_name)))
@@ -173,6 +177,27 @@ async def loadT(exp: HeaderParameter, sub: HeaderParameter, file: UploadFile, df
 async def delT(exp: HeaderParameter, sub: HeaderParameter, filename, df_name='bills'):
     read_data.add_user(exp, sub)
     asyncio.create_task(read_data.delete_tb_df(sub, df_name, filename))
+
+@app.post('/add_config', summary='Get history of currently logged in user')
+async def add_config(exp: HeaderParameter, sub: HeaderParameter, data = Body()):
+    read_data.add_user(exp, sub)
+    conf = db.add_new_configuration(sub, data)
+    return conf
+
+@app.get('/history', summary='Get history of currently logged in user')
+async def get_history(exp: HeaderParameter, sub: HeaderParameter):
+    read_data.add_user(exp, sub)
+    conf = db.get_user_configurations(sub)
+    if conf == None:
+         pass
+    return conf
+
+@app.get('/distribution/{config_id}', summary='Get history of currently logged in user')
+async def get_history(exp: HeaderParameter, sub: HeaderParameter, config_id):
+    conf = db.get_user_configuration(config_id)
+    if conf == None:
+         pass
+    return conf
 
 @app.get('/task_status/{task_id}')
 async def task_status(task_id: str):

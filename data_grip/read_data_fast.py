@@ -51,7 +51,7 @@ def get_df(user, df_name):
 async def load_df(user, df_name):
     df = pd.DataFrame()
     async with ClientSession() as session:
-        file_list = await mini.list_files('user-tabels', user, df_name)
+        file_list = await mini.list_only_files('user-tabels', user, df_name)
         tasks = []
         for file in file_list:
             presigned_url = await mini.presigned_get_object('user-tabels', f'{user}/{df_name}/{file}')
@@ -75,8 +75,8 @@ async def upload_tb_df(user, df_name, filename, file):
     df = get_df(user, df_name)
     print("upload", df.head())
     async with ClientSession() as session:
-
-        if filename.split('/')[-1] in await mini.list_files('user-tabels', user, df_name):
+        t = await mini.list_files('user-tabels', user, df_name)
+        if filename.split('/')[-1] in t:
             print("File exist")
             return {"error": "File exist"}
 
@@ -115,3 +115,6 @@ def remove_expired_users():
     expired_users = [user for user, data in users.items() if data['exp'] is not None and data['exp'] < current_time]
     for user in expired_users:
         del users[user]
+
+async def get_list_files(user, df_name):
+    return await mini.list_files('user-tabels', user, df_name)

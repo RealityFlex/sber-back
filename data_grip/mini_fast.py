@@ -53,6 +53,18 @@ async def list_files(bucket, sub, df_name):
         for obj in objects:
             if not obj.is_dir:
                 file_name = obj.object_name[len(f"{sub}/{df_name}/"):]
+                result.append({"id":obj.etag, "filename":file_name})
+    except S3Error as e:
+        print("Error occurred.", e)
+    return result
+
+async def list_only_files(bucket, sub, df_name):
+    result = []
+    try:
+        objects = await client.list_objects(bucket, prefix=f"{sub}/{df_name}/", recursive=True)
+        for obj in objects:
+            if not obj.is_dir:
+                file_name = obj.object_name[len(f"{sub}/{df_name}/"):]
                 result.append(file_name)
     except S3Error as e:
         print("Error occurred.", e)
