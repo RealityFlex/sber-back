@@ -3,7 +3,7 @@
 {{$host := .}}
 
 { 
-    "endpoint": "/docs",
+    "endpoint": "/api/docs",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -31,7 +31,7 @@
     ]
 },
 { 
-    "endpoint": "/get_rows",
+    "endpoint": "/api/tables/get_rows",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -57,7 +57,7 @@
     ]
 },
 { 
-    "endpoint": "/get_table",
+    "endpoint": "/api/tables/get_table",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -83,7 +83,7 @@
     ]
 },
 { 
-    "endpoint": "/filter",
+    "endpoint": "/api/tables/filter",
     "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -109,7 +109,7 @@
     ]
 },
 { 
-    "endpoint": "/load_table",
+    "endpoint": "/api/tables/load_table",
     "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -135,7 +135,7 @@
     ]
 },
 { 
-    "endpoint": "/list_files",
+    "endpoint": "/api/tables/list_files",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -161,7 +161,7 @@
     ]
 },
 { 
-    "endpoint": "/add_config",
+    "endpoint": "/api/tables/add_config",
     "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -187,7 +187,7 @@
     ]
 },
 { 
-    "endpoint": "/history",
+    "endpoint": "/api/tables/history",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -213,7 +213,7 @@
     ]
 },
 { 
-    "endpoint": "/delete_table",
+    "endpoint": "/api/tables/delete_table",
     "method": "DELETE",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -239,7 +239,7 @@
     ]
 },
 { 
-    "endpoint": "/sort",
+    "endpoint": "/api/tables/sort",
     "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -265,7 +265,7 @@
     ]
 },
 { 
-    "endpoint": "/pre_load_table",
+    "endpoint": "/api/tables/pre_load_table",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],
@@ -291,7 +291,7 @@
     ]
 },
 { 
-    "endpoint": "/distribution/{config_id}",
+    "endpoint": "/api/distribution/{config_id}",
     "method": "GET",
     "output_encoding": "no-op",
     "input_headers": ["*"],

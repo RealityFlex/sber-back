@@ -104,53 +104,35 @@ async def sortT(sort: Sort, exp: Optional[str] = Header(None), sub: Optional[str
         read_data.set_df(sub, df_name, df)
     return data
 
-# @app.post("/edit_cell")
-# async def edit_C(edit: Edit, exp: Optional[str] = Header(None), sub: Optional[str] = Header(None), n: int = 10, pg: int = 0, df_name: str = 'bills'):
-#     read_data.add_user(exp, sub)
-#     df_name = df_name+"_edit"
-#     df = read_data.get_df(sub, df_name)
-#     if df.empty:
-#         return "Таблица не загружена"
-#     else:
-#         try:
-#         # Получаем индексы строк и столбцов
-#             row_idx = edit.row
-#             col_idx = edit.column
-#             # Если value == 'del' и column == None, удаляем ячейку
-#             if edit.value == 'del' and edit.column is None:
-#                 df.at[row_idx, col_idx] = None 
-#             # В противном случае, преобразовываем значение к типу данных в ячейке
-#             else:
-#                 target_dtype = df.dtypes[col_idx]  # тип данных в столбце
-#                 if pd.api.types.is_object_dtype(target_dtype):
-#                     df.at[row_idx, col_idx] = edit.value
-#                 elif pd.api.types.is_integer_dtype(target_dtype):
-#                     print(target_dtype, edit.value, type(edit.value), int(edit.value))
-#                     df.at[row_idx, col_idx] = int(edit.value)
-#                 elif pd.api.types.is_float_dtype(target_dtype):
-#                     df.at[row_idx, col_idx] = float(edit.value)
-#                 elif pd.api.types.is_datetime64_any_dtype(target_dtype):
-#                     # Преобразование строки в datetime, если необходимо
-#                     try:
-#                         df.at[row_idx, col_idx] = pd.to_datetime(edit.value)
-#                     except ValueError:
-#                         return f"Невозможно преобразовать значение {edit.value} к типу {target_dtype}"
-#                 elif pd.api.types.is_bool_dtype(target_dtype):
-#                     if edit.value.lower() in ['true', 'false']:
-#                         df.at[row_idx, col_idx] = edit.value.lower() == 'true'
-#                     else:
-#                         return f"Невозможно преобразовать значение {edit.value} к типу {target_dtype}"
-#                 else:
-#                     return f"Не поддерживаемый тип данных столбца: {target_dtype}"
-
-#         except Exception as e:
-#             print(f"Error editing DataFrame: {e}")
-#             return f"Error editing DataFrame: {e}"
-#         start_idx = pg * n
-#         end_idx = start_idx + n
-#         data = df.iloc[start_idx:end_idx].to_dict('records')
-#     read_data.set_df(sub, df_name, df)
-#     return data
+@app.post("/edit_cell")
+async def edit_C(edit: Edit, exp: Optional[str] = Header(None), sub: Optional[str] = Header(None), n: int = 10, pg: int = 0, df_name: str = 'bills'):
+    read_data.add_user(exp, sub)
+    df_name = df_name+"_edit"
+    df = read_data.get_df(sub, df_name)
+    if df.empty:
+        return "Таблица не загружена"
+    else:
+        try:
+        # Получаем индексы строк и столбцов
+            row_idx = edit.row
+            col_idx = edit.column
+            # Если value == 'del' и column == None, удаляем ячейку
+            if edit.value == 'del' and edit.column is None:
+                df = df.drop(row_idx).reset_index(drop=True)
+            # В противном случае, преобразовываем значение к типу данных в ячейке
+            else:
+                for i in row_idx:
+                    dtype = df[col_idx].dtype  # Get the dtype of the column
+                    df.at[i, col_idx] = dtype.type(edit.value)
+                
+        except Exception as e:
+            print(f"Error editing DataFrame: {e}")
+            return f"Error editing DataFrame: {e}"
+        start_idx = pg * n
+        end_idx = start_idx + n
+        data = df.iloc[start_idx:end_idx].to_dict('records')
+    read_data.set_df(sub, df_name, df)
+    return data
 
 @app.get("/pre_load_table")
 async def getT(exp: HeaderParameter, sub: HeaderParameter, n:int=10, pg:int=0, df_name='bills'):
