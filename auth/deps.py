@@ -25,7 +25,7 @@ async def refresh_current_user(token: str = Depends(reuseable_oauth)):
         payload = jwt.decode(
             token, JWT_REFRESH_SECRET_KEY, algorithms=[ALGORITHM]
         )
-        return {"email":payload['sub']}
+        return {"username":payload['sub']}
     except(jwt.JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
