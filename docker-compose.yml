@@ -12,7 +12,7 @@ services:
   data_grip:
     build: ./data_grip
     restart: always
-    command: uvicorn main:app --host 0.0.0.0
+    command: uvicorn fast_main:app --host 0.0.0.0
     ports:
       - 8180:8000
 
