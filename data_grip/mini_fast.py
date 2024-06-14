@@ -3,6 +3,7 @@ from datetime import timedelta
 from miniopy_async import Minio
 from miniopy_async.error import S3Error
 from miniopy_async.deleteobjects import DeleteObject
+from miniopy_async.commonconfig import REPLACE, CopySource
 import asyncio
 import pandas
 
@@ -79,3 +80,10 @@ async def presigned_get_object(bucket, filepath):
         bucket, filepath, expires=timedelta(hours=2)
     )
     return url
+
+async def copy(bucket, oject, source_backet, source_object):
+    await client.copy_object(
+        bucket,
+        oject,
+        CopySource(source_backet, source_object)
+    )

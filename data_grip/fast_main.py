@@ -1,17 +1,18 @@
 import uvicorn
-from fastapi import FastAPI, File, UploadFile, status, Header, Request, Depends, BackgroundTasks, Body
+from fastapi import FastAPI, File, UploadFile, status, Header, Request, Depends, BackgroundTasks, Body, HTTPException
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from tables_fast import Table
 from pydantic import BaseModel
-from typing import Union, List, Optional, Annotated
+from typing import Union, List, Optional, Annotated, Dict, Any
 # import mini
 import json
 import read_data_fast as read_data
 import asyncio
 import db_w as db
+import uuid
 # import pandas as pd
 from tasks import celery_use_filter, celery_get_rows, celery_get_table, get_res
 HeaderParameter = Annotated[Union[str, None], Header()]
@@ -22,6 +23,7 @@ origins = [
 ]
 
 tb = Table()
+# tb.init()
 
 class Value(BaseModel):
     key: str
@@ -50,6 +52,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+tasks: Dict[str, Dict[str, Any]] = {}
 
 async def load_data(sub, df_name):
     await read_data.load_df(sub, df_name)
@@ -159,11 +163,32 @@ async def list_files(exp: HeaderParameter, sub: HeaderParameter, df_name='bills'
     return await read_data.get_list_files(sub,df_name)
 
 @app.post("/filter")
-async def filterR(exp: HeaderParameter, sub: HeaderParameter, data: List[Value], df_name='filter'):
+async def filterR(exp: HeaderParameter, sub: HeaderParameter, data: List[Value], df_name='bills'):
     read_data.add_user(exp, sub)
-    asyncio.create_task(tb.use_filter(data=jsonable_encoder(data), sub=sub, 
-                                        df_name=df_name, df_real=read_data.get_df(sub, df_name)))
-    return {"message": "Задача улетела"}
+    # asyncio.create_task(tb.use_filter(data=jsonable_encoder(data), sub=sub, 
+    #                                     df_name=df_name, df_real=read_data.get_df(sub, df_name)))
+    task_id = str(uuid.uuid4())
+    tasks[task_id] = {"status": "in_progress", "result": None}
+
+    async def task_wrapper():
+        try:
+            result = await tb.use_filter(data=jsonable_encoder(data), sub=sub, df_name="filter", df_real=read_data.get_df(sub, df_name))
+            tasks[task_id]["status"] = "completed"
+            tasks[task_id]["result"] = result
+        except Exception as e:
+            tasks[task_id]["status"] = "failed"
+            tasks[task_id]["result"] = str(e)
+    
+    asyncio.create_task(task_wrapper())
+
+    return {"message": "Задача улетела", 'id':task_id}
+
+@app.get("/status/{task_id}")
+async def get_status(task_id: str):
+    if task_id not in tasks:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return tasks[task_id]
 
 @app.post("/load_table")
 async def loadT(exp: HeaderParameter, sub: HeaderParameter, file: UploadFile, df_name='bills'):

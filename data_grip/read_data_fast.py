@@ -52,6 +52,9 @@ async def load_df(user, df_name):
     df = pd.DataFrame()
     async with ClientSession() as session:
         file_list = await mini.list_only_files('user-tabels', user, df_name)
+        if len(file_list) == 0:
+            await mini.copy('user-tabels', f'{user}/{df_name}/low.xlsx', 'user-tabels', 'Default-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/bills/low_data.xlsx')
+            file_list = await mini.list_only_files('user-tabels', user, df_name)
         tasks = []
         for file in file_list:
             presigned_url = await mini.presigned_get_object('user-tabels', f'{user}/{df_name}/{file}')

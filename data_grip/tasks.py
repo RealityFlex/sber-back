@@ -8,6 +8,7 @@ import read_data
 import json
 
 tb = Table()
+# tb.init()
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 465

@@ -7,15 +7,18 @@ import asyncio
 class Table:  
 
     def __init__(self):
+        pass
+        
+    # async def init(self):
+    #     self.base_df = await read_data.load_df("Default-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", "bills")
+    #     print(self.base_df.head())
+    #     print("Tables starting")
 
-        # self.base_df = read_data.load_df(sub, df_name)
-
-        print("Tables starting")
     # def display_count(self):  
     def get_rows(self, sub, df_name):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0: 
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             if df.empty:
@@ -25,7 +28,7 @@ class Table:
     def get_table(self, sub, df_name, n=10, pg=0):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             print("<<<")
@@ -47,7 +50,7 @@ class Table:
     def pre_load_table(self, sub, df_name, n=10, pg=0):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             print("<<<")
@@ -93,10 +96,11 @@ class Table:
 
     async def use_filter(self, data, sub,  df_name='filter', df_real=None):
         df = df_real
-
-        for operation in data:
-            df = self.apply_operation(df, dict(operation))
-        
+        try:
+            for operation in data:
+                df = self.apply_operation(df, dict(operation))
+        except Exception as e:
+            print(e)
         read_data.set_df(sub, df_name, df)
         asyncio.create_task(read_data.save_df_to_minio(sub, df_name, df))
         return "data_saved"

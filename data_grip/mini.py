@@ -4,6 +4,7 @@ from minio.error import S3Error
 import io
 from datetime import timedelta
 from minio.deleteobjects import DeleteObject
+from minio.commonconfig import REPLACE, CopySource
 
 client = Minio(
     "62.109.8.64:9000",
