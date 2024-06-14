@@ -211,8 +211,7 @@
         "method": "GET"
         }
     ]
-}
-,
+},
 { 
     "endpoint": "/delete_table",
     "method": "DELETE",
@@ -236,6 +235,84 @@
         "host": ["{{ $host }}"],
         "url_pattern": "/delete_table",
         "method": "DELETE"
+        }
+    ]
+},
+{ 
+    "endpoint": "/sort",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/sort",
+        "method": "POST"
+        }
+    ]
+},
+{ 
+    "endpoint": "/pre_load_table",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/pre_load_table",
+        "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/distribution/{config_id}",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/distribution/{config_id}",
+        "method": "GET"
         }
     ]
 }
