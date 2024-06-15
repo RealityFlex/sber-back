@@ -27,7 +27,7 @@ app = FastAPI()
 async def docs():
     return RedirectResponse(url='/docs')
 
-@app.get("/jwk")
+@app.get("/api/jwk")
 def get_jwk():
     return {"keys": [json.loads(PUBLIC_KEY)]}
 

@@ -25,6 +25,10 @@ origins = [
 tb = Table()
 # tb.init()
 
+@app.get("/api/jwk")
+def get_jwk():
+    return {"keys": [{"e":"AQAB","kty":"RSA","n":"3umIRQ-1weEms044tv5Fzb076bG4wyXx8eTMZJeNzlForlo9WVIO5GYuHpCD8v6viYUwrJGl77eMtBEw3hjRi0T6jCdlJlS-MGk99L2BIAAvXf9AhSHXuiY0clenwhgQHiBBnPrGLcSfNaRtVw1O2Vcvt6c1t7c8jfO7akLj1-zpeavIu4M8YbhF-fAip6DkX09b1npTtTXidYMu739G7Jf4jy0o9Obt13YUC-f7ivPOHK7nYLN50h7k2w0qj-DY_QKdLo8xk9edZzrc7uW6viGJWkMAOx60lrNyhnne_D_6atpN6rqvOYnC4V1Zt4P4mF7ofczGni8o3ckPW32OCQ"}]}
+
 class Value(BaseModel):
     key: str
     filter: Union[str, None] = None
