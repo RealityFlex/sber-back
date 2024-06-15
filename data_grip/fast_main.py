@@ -58,7 +58,7 @@ tasks: Dict[str, Dict[str, Any]] = {}
 async def load_data(sub, df_name):
     await read_data.load_df(sub, df_name)
 
-@app.get("/api/tables/get_table", response_model=Union[List[dict], str], summary="Получить данные таблицы", tags=["Получение данных"])
+@app.get("/api/tables/get_table", summary="Получить данные таблицы", tags=["Получение данных"])
 async def getT(
     exp: str = Header(..., description="Параметр заголовка exp"),
     sub: str = Header(..., description="Параметр заголовка sub"),
@@ -81,6 +81,7 @@ async def getT(
     - Страницу данных с n записями.
     """
     read_data.add_user(exp, sub)
+    df_name = df_name+"_edit"
     df = read_data.get_df(sub, df_name)
     if df.empty:
         return "Таблица не загружена"
@@ -124,6 +125,8 @@ async def sortT(
     - Отсортированные и/или отфильтрованные данные с пагинацией.
     - Сообщение "Таблица не загружена", если таблица не найдена.
     """
+    df_name = df_name+"_edit"
+
     read_data.add_user(exp, sub)
     df = read_data.get_df(sub, df_name)
     if df.empty:
@@ -139,7 +142,6 @@ async def sortT(
         # Фильтруем DataFrame по маске
         df = df[mask]
     
-    df_name = df_name + "_edit"
     start_idx = pg * n
     end_idx = start_idx + n
     data = df.iloc[start_idx:end_idx].to_dict('records')
@@ -224,7 +226,7 @@ async def getT(
     """
     try:
         read_data.add_user(exp, sub)
-        asyncio.create_task(read_data.load_data(sub, df_name))
+        asyncio.create_task(read_data.load_df(sub, df_name))
         return {"message": "Загрузка данных началась"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при запуске загрузки данных: {e}")
@@ -257,7 +259,7 @@ async def filterR(
     exp: str = Header(None, description="Параметр заголовка exp"),
     sub: str = Header(None, description="Параметр заголовка sub"),
     data: List[Value] = Body(..., description="Список значений для фильтрации"),
-    df_name: str = 'bills'
+    df_name: str = 'bills_edit'
     ):
     """
     Фильтрация данных в указанной таблице для конкретного пользователя.

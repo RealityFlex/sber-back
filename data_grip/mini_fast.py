@@ -54,7 +54,7 @@ async def list_files(bucket, sub, df_name):
         for obj in objects:
             if not obj.is_dir:
                 file_name = obj.object_name[len(f"{sub}/{df_name}/"):]
-                result.append({"id":obj.etag, "filename":file_name})
+                result.append({"id":obj.etag, "name":file_name})
     except S3Error as e:
         print("Error occurred.", e)
     return result

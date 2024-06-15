@@ -91,7 +91,6 @@ class Table:
         if sub_operations:
             for sub_operation in sub_operations:
                 df = self.apply_operation(df, dict(sub_operation))
-        
         return df
 
     async def use_filter(self, data, sub,  df_name='filter', df_real=None):
@@ -102,6 +101,7 @@ class Table:
         except Exception as e:
             print(e)
         read_data.set_df(sub, df_name, df)
+        read_data.set_df(sub, df_name+"_edit", df)
         asyncio.create_task(read_data.save_df_to_minio(sub, df_name, df))
         return "data_saved"
         # start_idx = pg * n
