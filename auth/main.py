@@ -7,6 +7,7 @@ import json
 from fastapi import FastAPI, Header
 from typing_extensions import Annotated
 from typing import List, Union
+from pydantic import BaseModel
 
 HeaderParameter = Annotated[Union[str, None], Header()]
 
@@ -22,6 +23,9 @@ from uuid import uuid4
 from deps import get_current_user, refresh_current_user
 
 app = FastAPI()
+
+class Token(BaseModel):
+    refresh_token: str
 
 @app.get('/', response_class=RedirectResponse, include_in_schema=False)
 async def docs():
@@ -85,8 +89,10 @@ async def get_history(user: SystemUser = Depends(get_current_user)):
          pass
     return conf
 
-@app.get('/refresh', summary="Refresh tokens for user", response_model=TokenSchema)
-async def refresh_me(user: SystemUser = Depends(refresh_current_user)):
+@app.post('/refresh', summary="Refresh tokens for user", response_model=TokenSchema)
+async def refresh_me(token: Token):
+    user = await refresh_current_user(token.refresh_token)
+    print(user)
     user = db.get_user(user['username'])
     if user != None:
         user = user.as_dict()
