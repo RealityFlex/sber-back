@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build -t $LOGIN/$NAME:latest ./project
+        run: docker build -t $LOGIN/$NAME:latest ./auth
       - name: Docker login
         run: echo ${{ secrets.DOCKERHUB_PASS }} | docker login -u ${{ secrets.DOCKERHUB_LOGIN }} --password-stdin
       - name: Push image
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build image
-        run: docker build -t $LOGIN/$NAME:latest ./project
+        run: docker build -t $LOGIN/$NAME:latest ./data_grip
       - name: Docker login
         run: echo ${{ secrets.DOCKERHUB_PASS }} | docker login -u ${{ secrets.DOCKERHUB_LOGIN }} --password-stdin
       - name: Push image
