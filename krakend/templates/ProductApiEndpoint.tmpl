@@ -59,7 +59,7 @@
 },
 { 
     "endpoint": "/api/auth/refresh",
-    "method": "GET",
+    "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
     "input_query_strings": ["*"],
@@ -67,7 +67,7 @@
         {
         "host": ["{{ $host }}"],
         "url_pattern": "/refresh",
-        "method": "GET"
+        "method": "POST"
         }
     ]
 }
