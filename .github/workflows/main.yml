@@ -47,5 +47,5 @@ jobs:
             pass: ${{ secrets.VIRTUAL_PASS }}
             run: |
               cd sber-back
-              docker-compose pull
-              docker-compose up -d
+              docker compose pull
+              docker compose up -d
