@@ -51,7 +51,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/get_rows",
+        "url_pattern": "/api/tables/get_rows",
         "method": "GET"
         }
     ]
@@ -77,7 +77,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/get_table",
+        "url_pattern": "/api/tables/get_table",
         "method": "GET"
         }
     ]
@@ -103,7 +103,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/filter",
+        "url_pattern": "/api/tables/filter",
         "method": "POST"
         }
     ]
@@ -129,7 +129,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/load_table",
+        "url_pattern": "/api/tables/load_table",
         "method": "POST"
         }
     ]
@@ -155,7 +155,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/list_files",
+        "url_pattern": "/api/tables/list_files",
         "method": "GET"
         }
     ]
@@ -181,7 +181,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/add_config",
+        "url_pattern": "/api/tables/add_config",
         "method": "POST"
         }
     ]
@@ -207,7 +207,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/history",
+        "url_pattern": "/api/tables/history",
         "method": "GET"
         }
     ]
@@ -233,7 +233,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/delete_table",
+        "url_pattern": "/api/tables/delete_table",
         "method": "DELETE"
         }
     ]
@@ -259,7 +259,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/sort",
+        "url_pattern": "/api/tables/sort",
         "method": "POST"
         }
     ]
@@ -285,7 +285,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/pre_load_table",
+        "url_pattern": "/api/tables/pre_load_table",
         "method": "GET"
         }
     ]
@@ -311,7 +311,7 @@
     "backend": [
         {
         "host": ["{{ $host }}"],
-        "url_pattern": "/distribution/{config_id}",
+        "url_pattern": "/api/distribution/{config_id}",
         "method": "GET"
         }
     ]
