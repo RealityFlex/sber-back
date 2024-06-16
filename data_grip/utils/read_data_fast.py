@@ -41,7 +41,7 @@ async def save_df_to_minio(user, table, df):
 
 def get_df(user, df_name):
     if user in users:
-        if df_name in users[user]:
+        if df_name in users[user] and not users[user][df_name].empty:
             return users[user][df_name]
         else:
             return pd.DataFrame()
