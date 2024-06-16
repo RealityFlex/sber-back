@@ -7,6 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from utils.tables_fast import Table
 from pydantic import BaseModel
 from typing import Union, List, Optional, Annotated, Dict, Any
+import requests
 # import mini
 import json
 import utils.read_data_fast as read_data
@@ -21,6 +22,9 @@ app = FastAPI()
 origins = [
     "*",
 ]
+
+class DeleteCellRequest(BaseModel):
+    row: List[int]
 
 tb = Table()
 # tb.init()
@@ -387,30 +391,30 @@ async def delT(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при удалении таблицы: {e}")
 
-@app.post('/api/tables/add_config', summary='Добавление конфигурации', tags=["Получение данных"])
-async def add_config(
-    exp: str = Header(None, description="Параметр заголовка exp"),
-    sub: str = Header(None, description="Параметр заголовка sub"),
-    data: FilterData = Body(..., description="Список значений для фильтрации")
-):
-    """
-    Добавление новой конфигурации для указанного пользователя.
+# @app.post('/api/tables/add_config', summary='Добавление конфигурации', tags=["Получение данных"])
+# async def add_config(
+#     exp: str = Header(None, description="Параметр заголовка exp"),
+#     sub: str = Header(None, description="Параметр заголовка sub"),
+#     data: FilterData = Body(..., description="Список значений для фильтрации")
+# ):
+#     """
+#     Добавление новой конфигурации для указанного пользователя.
 
-    - **exp**: Параметр заголовка exp.
-    - **sub**: Параметр заголовка sub.
-    - **data**: Данные конфигурации.
+#     - **exp**: Параметр заголовка exp.
+#     - **sub**: Параметр заголовка sub.
+#     - **data**: Данные конфигурации.
 
-    Возвращает:
-    - Результат операции добавления конфигурации.
-    """
-    try:
-        read_data.add_user(exp, sub)
-        conf_json = data.dict()
-        conf = db.add_new_configuration(sub, conf_json)
-        return conf
+#     Возвращает:
+#     - Результат операции добавления конфигурации.
+#     """
+#     try:
+#         read_data.add_user(exp, sub)
+#         conf_json = data.dict()
+#         conf = db.add_new_configuration(sub, conf_json)
+#         return conf
     
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка при добавлении конфигурации: {e}")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Ошибка при добавлении конфигурации: {e}")
 
 @app.get('/api/tables/history', summary='Получение истории конфигураций текущего пользователя', tags=["Получение данных"])
 async def get_history(
@@ -429,25 +433,44 @@ async def get_history(
     try:
         read_data.add_user(exp, sub)
         conf = db.get_user_configurations(sub)
-        
         if conf is None:
             return {"message": "Конфигурации не найдены"}
         return conf
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при получении истории конфигураций: {e}")
 
-@app.get('/api/distribution/start')
+@app.post('/api/distribution/start')
 async def start_distribution( 
     exp: str = Header(None, description="Параметр заголовка exp"),
-    sub: str = Header(None, description="Параметр заголовка sub")
+    sub: str = Header(None, description="Параметр заголовка sub"),
+    data: FilterData = Body(..., description="Список значений для фильтрации")
     ):
     conf = read_data.get_conf(sub, "config")
     try:
         read_data.add_user(exp, sub)
-        conf = db.add_new_configuration(sub, conf)
+        conf_json = data.dict()
+        conf = db.add_new_configuration(sub, conf_json)
+        res = requests.get(f'http://62.109.8.64:8288/distributed_bills?id_distr_returnable={conf["config_id"]}&user_name={sub}&bills_link={"Hey"}')
+        if res.status_code == 200:
+           db.update_distribution_task_id(conf['config_id'], res.json()['task_id'])
+           conf = db.get_user_configuration(conf["config_id"])
         return conf
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при добавлении конфигурации: {e}")
+
+@app.delete('/api/tables/delete_cell')
+def del_cell(
+    exp: str = Header(None, description="Параметр заголовка exp"),
+    sub: str = Header(None, description="Параметр заголовка sub"),
+    row: DeleteCellRequest=None):
+
+    read_data.add_user(exp, sub)
+    df_name = df_name + "_edit"
+    df = read_data.get_df(sub, df_name)
+    df = df.drop(row).reset_index(drop=True)
+    
+    read_data.set_df(sub, df_name, df)
+
 
 @app.get('/api/distribution/{config_id}', summary='Получение конфигурации пользователя по ID', tags=["Получение данных"])
 async def get_distribution(
@@ -467,8 +490,22 @@ async def get_distribution(
     """
     try:
         read_data.add_user(exp, sub)
-        conf = db.get_user_configuration(config_id)
-        
+        conf = db.get_user_configuration(config_id).as_dict()
+        print(conf)
+
+        if conf['distribution_info'] != None:
+            return {"config_id":config_id, "create_at":conf['create_at'], "status":"sucsess", 'data':conf['distribution_info']}
+
+        res = requests.get(f'http://62.109.8.64:8288/task_status/{conf["distribution_task_id"]}').json()
+        print(res)
+        if res['status'] == 'PENDING':
+            return {"config_id":config_id, "create_at":conf['create_at'], "status":'PENDING', 'data':res['result']}
+        elif res['status'] != 'FAILURE':
+            db.update_distribution_task_id(config_id, res['task_id'])
+            return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
+        elif res['status'] == 'FAILURE':
+            return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
+
         if conf is None:
             return {"message": "Конфигурация не найдена"}
         

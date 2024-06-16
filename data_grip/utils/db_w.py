@@ -35,10 +35,19 @@ class Configuration(Base):
     config_data = Column(JSON, nullable=False)
     create_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     owner = relationship('User', back_populates='configurations')
-    distribution_url = Column(String(100), default=None)
+    distribution_task_id = Column(String(100), default=None)
+    distribution_info = Column(JSON, default=None)
+
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {
+            'config_id': str(self.config_id),
+            'user_id': str(self.user_id),
+            'config_data': self.config_data,
+            'create_at': self.create_at.isoformat(),
+            'distribution_task_id': self.distribution_task_id,
+            'distribution_info': self.distribution_info
+        }
 
 
 engine = create_engine(f"postgresql+psycopg2://lct_guest:postgres@{docker_ip}:{docker_port}/lct_user_db")
@@ -86,3 +95,27 @@ def get_user_configuration(config_id: str):
     configurations = session.query(Configuration).filter(Configuration.config_id == config_id).first()
     session.close()
     return configurations
+
+def update_distribution_task_id(config_id: UUID, new_task_id: str):
+    session = Session(expire_on_commit=False)
+    try:
+        # Обновление значения distribution_task_id по заданному config_id
+        session.query(Configuration).filter(Configuration.config_id == config_id).update({"distribution_task_id": new_task_id})
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+def distribution_info(config_id: UUID, new_info: dict):
+    session = Session(expire_on_commit=False)
+    try:
+        # Обновление значения distribution_task_id по заданному config_id
+        session.query(Configuration).filter(Configuration.config_id == config_id).update({"distribution_info": new_info})
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise
+    finally:
+        session.close()
