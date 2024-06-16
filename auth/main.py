@@ -1,8 +1,8 @@
 from fastapi import FastAPI, status, HTTPException, Depends, Body, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
-from auth.utils.schemas import UserOut, UserAuth, TokenSchema, SystemUser
-import auth.utils.db_w as db
+from utils.schemas import UserOut, UserAuth, TokenSchema, SystemUser
+import utils.db_w as db
 import json
 from fastapi import FastAPI, Header
 from typing_extensions import Annotated
@@ -12,7 +12,7 @@ from pydantic import BaseModel
 HeaderParameter = Annotated[Union[str, None], Header()]
 
 # from replit import db
-from auth.utils.utils import (
+from utils.utils import (
     get_hashed_password,
     create_access_token,
     create_refresh_token,
@@ -20,7 +20,7 @@ from auth.utils.utils import (
     PUBLIC_KEY
 )
 from uuid import uuid4
-from auth.utils.deps import get_current_user, refresh_current_user
+from utils.deps import get_current_user, refresh_current_user
 
 app = FastAPI()
 

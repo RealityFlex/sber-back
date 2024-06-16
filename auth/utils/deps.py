@@ -11,8 +11,8 @@ from auth.utils.utils import (
 
 from jose import jwt
 from pydantic import ValidationError
-from auth.utils.schemas import TokenPayload, SystemUser
-import auth.utils.db_w as db
+from schemas import TokenPayload, SystemUser
+import db_w as db
 # from replit import db
 
 reuseable_oauth = OAuth2PasswordBearer(
