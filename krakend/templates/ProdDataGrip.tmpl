@@ -291,6 +291,32 @@
     ]
 },
 { 
+    "endpoint": "/api/tables/restore",
+    "method": "GET",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/api/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/api/tables/restore",
+        "method": "GET"
+        }
+    ]
+},
+{ 
     "endpoint": "/api/distribution/{config_id}",
     "method": "GET",
     "output_encoding": "no-op",
@@ -315,6 +341,7 @@
         "method": "GET"
         }
     ]
-}
+},
+
 
 {{end}}

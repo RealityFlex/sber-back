@@ -159,6 +159,16 @@ async def sortT(
     read_data.set_df(sub, df_name, df)
     return data
 
+@app.get("/api/tables/restore", summary="Откатить изменения таблицы", tags=["Изменение таблиц"])
+async def restore(
+    exp: Optional[str] = Header(None, description="Параметр заголовка exp"),
+    sub: Optional[str] = Header(None, description="Параметр заголовка sub"),
+    n: int = 10,
+    pg: int = 0,
+    df_name: str = 'bills'
+):
+    await tb.restore_table(sub, df_name)
+
 @app.post("/api/tables/edit_cell", response_model=Union[List[dict], str], summary="Редактирование ячеек таблицы", tags=["Изменение таблиц"])
 async def edit_C(
     edit: Edit = Body(..., description="Параметры редактирования ячеек"),

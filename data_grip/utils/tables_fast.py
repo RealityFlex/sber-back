@@ -88,6 +88,8 @@ class Table:
 
     async def use_filter(self, data, sub, df_name='filter', df_real=None):
         df = df_real
+        read_data.set_df(sub, df_name, pd.DataFrame())
+        read_data.set_df(sub, df_name + "_edit", pd.DataFrame())
         try:
             for configuration in data:
                 column = configuration['column']
@@ -99,6 +101,10 @@ class Table:
         read_data.set_df(sub, df_name + "_edit", df)
         asyncio.create_task(read_data.save_df_to_minio(sub, df_name, df))
         return "data_saved"
+    
+    async def restore_table(sub, df_name):
+        df_t = df_name + "_edit"
+        read_data.set_df(sub, df_t, read_data.get_df(sub, df_name))
         
             # start_idx = pg * n
             # end_idx = start_idx + n
