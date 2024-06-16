@@ -85,7 +85,6 @@ async def upload_tb_df(user, df_name, filename, file):
     df = get_df(user, df_name)
     print("upload", df.head())
     async with ClientSession() as session:
-        await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
         t = await mini.list_files('user-tabels', user, df_name)
         if filename.split('/')[-1] in t:
             print("File exist")
@@ -99,8 +98,12 @@ async def upload_tb_df(user, df_name, filename, file):
         else:
             return {"error": "Unsupported file format. Only CSV or Excel files are supported."}
 
+        if "low.xlsx" in t:
+            await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
+            df = dataframes
+        else:
         # Конкатенируем все полученные DataFrame
-        df = pd.concat([df, dataframes], ignore_index=True)
+            df = pd.concat([df, dataframes], ignore_index=True)
         print(df.info())
 
     df.replace([float('inf'), float('-inf'), float('nan')], 0, inplace=True)
