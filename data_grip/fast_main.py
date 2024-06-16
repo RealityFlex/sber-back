@@ -77,7 +77,7 @@ tasks: Dict[str, Dict[str, Any]] = {}
 async def load_data(sub, df_name):
     await read_data.load_df(sub, df_name)
 
-@app.post("/api/tables/get_table", summary="Получить данные таблицы", tags=["Получение данных"])
+@app.get("/api/tables/get_table", summary="Получить данные таблицы", tags=["Получение данных"])
 async def getT(
     exp: str = Header(..., description="Параметр заголовка exp"),
     sub: str = Header(..., description="Параметр заголовка sub"),
@@ -85,7 +85,8 @@ async def getT(
     pg: int = 0,
     df_name: str = 'bills',
     sort: str = None,
-    tb: GETTB = None
+    column: str = None
+    # tb: GETTB = None
 ):
     """
     Получить данные таблицы для конкретного пользователя.
@@ -110,19 +111,19 @@ async def getT(
         total_rows = len(df)
         total_pages = (total_rows) // n
 
-        if sort != None and tb != None and tb.find == None:
+        if sort != None and tb != None:
             if sort == "asc":
-                df = df.sort_values(by=tb.column, ascending=True)
+                df = df.sort_values(by=column, ascending=True)
             elif sort == "desc":
-                df = df.sort_values(by=tb.column, ascending=False)
+                df = df.sort_values(by=column, ascending=False)
 
-        if tb is not None and tb.find:
-            # Преобразуем указанные колонки в строковый тип для поиска
-            df_cp = df[tb.column].astype(str)
-            # Формируем маску для поиска по каждому столбцу и объединяем результаты
-            mask = df_cp.applymap(lambda x: tb.find in x).any(axis=1)
-            # Фильтруем DataFrame по маске
-            df = df[mask]
+        # if tb is not None and tb.find:
+        #     # Преобразуем указанные колонки в строковый тип для поиска
+        #     df_cp = df[tb.column].astype(str)
+        #     # Формируем маску для поиска по каждому столбцу и объединяем результаты
+        #     mask = df_cp.applymap(lambda x: tb.find in x).any(axis=1)
+        #     # Фильтруем DataFrame по маске
+        #     df = df[mask]
 
         start_idx = pg * n
         end_idx = start_idx + n
