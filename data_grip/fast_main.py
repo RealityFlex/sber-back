@@ -4,14 +4,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
-from tables_fast import Table
+from data_grip.utils.tables_fast import Table
 from pydantic import BaseModel
 from typing import Union, List, Optional, Annotated, Dict, Any
 # import mini
 import json
-import read_data_fast as read_data
+import data_grip.utils.read_data_fast as read_data
 import asyncio
-import db_w as db
+import data_grip.utils.db_w as db
 import uuid
 import pandas as pd
 from tasks import celery_use_filter, celery_get_rows, celery_get_table, get_res

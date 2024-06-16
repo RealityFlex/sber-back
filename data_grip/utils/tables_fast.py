@@ -1,19 +1,24 @@
 import pandas as pd
 import mini
-import read_data
+import data_grip.utils.read_data_fast as read_data
 import os
+import asyncio
 
 class Table:  
 
-    def __init__(self, filename):  
-        self.df = pd.read_excel(mini.presigned_get_object('hardcoded','low_data.xlsx'))
-        self.df = self.df.head(20)
-        print(self.df)
+    def __init__(self):
+        pass
+        
+    # async def init(self):
+    #     self.base_df = await read_data.load_df("Default-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", "bills")
+    #     print(self.base_df.head())
+    #     print("Tables starting")
+
     # def display_count(self):  
     def get_rows(self, sub, df_name):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0: 
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             if df.empty:
@@ -23,7 +28,7 @@ class Table:
     def get_table(self, sub, df_name, n=10, pg=0):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             print("<<<")
@@ -45,7 +50,7 @@ class Table:
     def pre_load_table(self, sub, df_name, n=10, pg=0):
         df = pd.DataFrame()
         if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df
+            df = self.base_df
         else:
             df = read_data.get_df(sub, df_name)
             print("<<<")
@@ -54,57 +59,49 @@ class Table:
                 df = read_data.load_df(sub, df_name)
         read_data.add_user_table(sub,df_name,df)
     
-    def apply_operation(self, df, operation):
-        key = operation['key']
-        filter_condition = operation['filter']
-        expression = operation['expression']
-        value = operation['value']
-        
+    def apply_operation(self, df, column, operation):
+        value = operation.get('value')
+        filter_condition = operation.get('filter')
+        expression = operation.get('expression')
+        sub_operations = operation.get('sub')
+
         # Apply filter if present
         if filter_condition:
-            if '@' in filter_condition:
-                filter_str = filter_condition.replace('@', f"`{key}`")
-            else:
-                filter_str = f"`{key}` {filter_condition}"
+            filter_str = filter_condition.replace('@', f"`{column}`")
             df = df.query(filter_str)
         
         # Apply expression if present
         if expression:
-            if '@' in expression:
-                expression_str = expression.replace('@', f"`{key}`")
-            else:
-                 expression_str = f"`{key}` {expression}"
-            df[key] = df.eval(expression_str)
+            expression_str = expression.replace('@', f"`{column}`")
+            df[column] = df.eval(expression_str)
         
         # Apply value if present
         if value is not None:
-            dtype = df[key].dtype  # Get the dtype of the column
-            df[key] = df[key].apply(lambda x: dtype.type(value))
+            dtype = df[column].dtype  # Get the dtype of the column
+            df[column] = df[column].apply(lambda x: dtype.type(value))
         
         # Process sub operations recursively
-        sub_operations = operation['sub']
         if sub_operations:
             for sub_operation in sub_operations:
-                df = self.apply_operation(df, dict(sub_operation))
-        
+                df = self.apply_operation(df, sub_operation)
         return df
 
-    def use_filter(self, data, sub, df_name, n, pg):
-        df = pd.DataFrame()
-        if len(mini.list_files('user-tabels',sub,df_name)) == 0:
-            df = self.df.copy()
-        else:
-            df = read_data.get_df(sub, df_name)
-            print("<<<")
-            if df.empty:
-                print(">>>")
-                df = read_data.load_df(sub, df_name)
-
-        for operation in data:
-            df = self.apply_operation(df, dict(operation))
+    async def use_filter(self, data, sub, df_name='filter', df_real=None):
+        df = df_real
+        try:
+            for configuration in data:
+                column = configuration['column']
+                for operation in configuration['operations']:
+                    df = self.apply_operation(df, column, operation)
+        except Exception as e:
+            print(e)
+        read_data.set_df(sub, df_name, df)
+        read_data.set_df(sub, df_name + "_edit", df)
+        asyncio.create_task(read_data.save_df_to_minio(sub, df_name, df))
+        return "data_saved"
         
-        # start_idx = pg * n
-        # end_idx = start_idx + n
-        # print(n, pg, start_idx, end_idx)
-        # df = df.iloc[start_idx:end_idx]
-        # return df.to_dict('records')
+            # start_idx = pg * n
+            # end_idx = start_idx + n
+            # print(n, pg, start_idx, end_idx)
+            # df = df.iloc[start_idx:end_idx]
+            # return df.to_dict('records')
