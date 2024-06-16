@@ -6,8 +6,8 @@ from jose import jwt
 from jwcrypto import jwk
 import json
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 15/60  # 30 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 30/60 #60 * 24 * 7 # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 15  # 30 minutes
+REFRESH_TOKEN_EXPIRE_MINUTES = 30 #60 * 24 * 7 # 7 days
 # JWT_SECRET_KEY = "qweqweqwe" #os.environ['JWT_SECRET_KEY']     # should be kept secret
 # JWT_REFRESH_SECRET_KEY = "qwe" #os.environ['JWT_REFRESH_SECRET_KEY']      # should be kept secret
 
