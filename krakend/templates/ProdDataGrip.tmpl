@@ -58,7 +58,7 @@
 },
 { 
     "endpoint": "/api/tables/get_table",
-    "method": "GET",
+    "method": "POST",
     "output_encoding": "no-op",
     "input_headers": ["*"],
     "input_query_strings": ["*"],
@@ -78,7 +78,7 @@
         {
         "host": ["{{ $host }}"],
         "url_pattern": "/api/tables/get_table",
-        "method": "GET"
+        "method": "POST"
         }
     ]
 },
@@ -313,6 +313,83 @@
         "host": ["{{ $host }}"],
         "url_pattern": "/api/tables/restore",
         "method": "GET"
+        }
+    ]
+},
+{ 
+    "endpoint": "/api/tables/edit_cell",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/api/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/api/tables/edit_cell",
+        "method": "POST"
+        }
+    ]
+},{ 
+    "endpoint": "/api/distribution/start",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/api/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/api/distribution/start",
+        "method": "POST"
+        }
+    ]
+},
+{ 
+    "endpoint": "/api/tables/delete_cell",
+    "method": "POST",
+    "output_encoding": "no-op",
+    "input_headers": ["*"],
+    "input_query_strings": ["*"],
+    "extra_config": {
+        "auth/validator": {
+            "alg": "RS256",
+            "jwk_url": "{{ $host }}/api/jwk",
+            "disable_jwk_security": true,
+            "operation_debug": true,
+            "propagate_claims": [
+            ["exp", "exp"],
+            ["sub", "sub"]
+            ]
+        }
+    },
+    "backend": [
+        {
+        "host": ["{{ $host }}"],
+        "url_pattern": "/api/tables/delete_cell",
+        "method": "POST"
         }
     ]
 },

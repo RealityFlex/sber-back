@@ -67,7 +67,7 @@ def get_user(username: str):
     session = Session(expire_on_commit=False)
     user = session.query(User).filter(User.username == username).first()
     session.close()
-    if user is None:
+    if user is None:    
         return None
     return user
 
@@ -108,7 +108,7 @@ def update_distribution_task_id(config_id: UUID, new_task_id: str):
     finally:
         session.close()
 
-def distribution_info(config_id: UUID, new_info: dict):
+def update_distribution_info(config_id: UUID, new_info: dict):
     session = Session(expire_on_commit=False)
     try:
         # Обновление значения distribution_task_id по заданному config_id

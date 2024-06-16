@@ -56,6 +56,11 @@ class Edit(BaseModel):
     column: str = None
     value: str
 
+class GETTB(BaseModel):
+    find: str = None
+    column: str = None
+
+
 # class ValueList(BaseModel):
 #     data: List[Value]
 
@@ -78,7 +83,9 @@ async def getT(
     sub: str = Header(..., description="Параметр заголовка sub"),
     n: int = 10,
     pg: int = 0,
-    df_name: str = 'bills'
+    df_name: str = 'bills',
+    sort: str = None,
+    tb: GETTB = None
 ):
     """
     Получить данные таблицы для конкретного пользователя.
@@ -102,6 +109,21 @@ async def getT(
     else:
         total_rows = len(df)
         total_pages = (total_rows) // n
+
+        if sort != None:
+            if sort == "asc":
+                df = df.sort_values(by=tb.column, ascending=True)
+            elif sort == "desc":
+                df = df.sort_values(by=tb.column, ascending=False)
+    
+        if tb.find:
+            # Преобразуем указанные колонки в строковый тип для поиска
+            df_cp = df[tb.column].astype(str)
+            # Формируем маску для поиска
+            mask = df_cp.apply(lambda row: row.str.contains(tb.find, na=False).any(), axis=1)
+            # Фильтруем DataFrame по маске
+            df = df[mask]
+
         start_idx = pg * n
         end_idx = start_idx + n
         if end_idx > total_rows-1:
@@ -445,7 +467,7 @@ async def start_distribution(
     sub: str = Header(None, description="Параметр заголовка sub"),
     data: FilterData = Body(..., description="Список значений для фильтрации")
     ):
-    conf = read_data.get_conf(sub, "config")
+    # conf = read_data.get_conf(sub, "config")
     try:
         read_data.add_user(exp, sub)
         conf_json = data.dict()
@@ -500,8 +522,8 @@ async def get_distribution(
         print(res)
         if res['status'] == 'PENDING':
             return {"config_id":config_id, "create_at":conf['create_at'], "status":'PENDING', 'data':res['result']}
-        elif res['status'] != 'FAILURE':
-            db.update_distribution_task_id(config_id, res['task_id'])
+        elif res['status'] == 'SUCCESS':
+            db.update_distribution_info(config_id, res['result'])
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
         elif res['status'] == 'FAILURE':
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}

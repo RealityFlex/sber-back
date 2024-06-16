@@ -126,11 +126,11 @@ def set_df(user, table, df):
     else:
         users[user] = {table: df}
 
-def get_conf(user, table):
-    if user in users:
-        return users[user][table]
-    else:
-        return None
+# def get_conf(user, table):
+#     if user in users:
+#         return users[user][table]
+#     else:
+#         return None
 
 def remove_expired_users():
     current_time = int(time.time())
