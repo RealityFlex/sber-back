@@ -50,11 +50,18 @@ def get_df(user, df_name):
     
 async def load_df(user, df_name):
     df = pd.DataFrame()
+    arr = ['list_contracts.xlsx','main_assets.xlsx',' service_codes.xlsx']
     async with ClientSession() as session:
         file_list = await mini.list_only_files('user-tabels', user, df_name)
         if len(file_list) == 0:
             await mini.copy('user-tabels', f'{user}/{df_name}/low.xlsx', 'user-tabels', 'Default-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/bills/low_data.xlsx')
             file_list = await mini.list_only_files('user-tabels', user, df_name)
+
+        hard_list = await mini.list_only_files('user-tabels', user, "hardcoded")
+        for i in arr:
+            if not i in hard_list:
+                await mini.copy('user-tabels', f'{user}/{df_name}/{i}', 'user-tabels', 'Default-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/hardcoded/{i}')
+        
         tasks = []
         for file in file_list:
             presigned_url = await mini.presigned_get_object('user-tabels', f'{user}/{df_name}/{file}')
@@ -78,6 +85,7 @@ async def upload_tb_df(user, df_name, filename, file):
     df = get_df(user, df_name)
     print("upload", df.head())
     async with ClientSession() as session:
+        await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
         t = await mini.list_files('user-tabels', user, df_name)
         if filename.split('/')[-1] in t:
             print("File exist")
