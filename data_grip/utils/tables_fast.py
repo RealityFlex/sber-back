@@ -59,32 +59,70 @@ class Table:
                 df = read_data.load_df(sub, df_name)
         read_data.add_user_table(sub,df_name,df)
     
-    def apply_operation(self, df, column, operation):
-        value = operation.get('value')
-        filter_condition = operation.get('filter')
-        expression = operation.get('expression')
-        sub_operations = operation.get('sub')
+    def apply_operation(self, df, column, operations):
+        try:
+            for operation in operations:
+                print(f"Operation: {operation}")
+                value = operation.get('value')
+                filter_condition = operation.get('filter')
+                expression = operation.get('expression')
 
+                if filter_condition:
+                    try:
+                        filter_str = filter_condition.replace('@', f"`{column}`")
+                        print(f"Applying filter: {filter_str}")
+                        df = df.query(filter_str)
+                        print(f"Filtered DataFrame:\n{df.head()}")
+                    except Exception as e:
+                        print(f"Error applying filter: {e}")
+                        continue  # Move to the next operation
+
+                if expression:
+                    try:
+                        expression_str = expression.replace('@', f"`{column}`")
+                        print(f"Applying expression: {expression_str}")
+                        df[column] = df.eval(expression_str)
+                        print(f"DataFrame after expression:\n{df.head()}")
+                    except Exception as e:
+                        print(f"Error applying expression: {e}")
+                        continue  # Move to the next operation
+
+                if value:
+                    try:
+                        dtype = df[column].dtype
+                        df[column] = df[column].apply(lambda x: dtype.type(value))
+                        print(f"DataFrame after applying value:\n{df.head()}")
+                    except Exception as e:
+                        print(f"Error applying value: {e}")
+                        continue  # Move to the next operation
+
+            return df
+
+        except Exception as e:
+            print(f"Unexpected error in apply_operation: {e}")
+        
+        except Exception as e:
+            print(e)
         # Apply filter if present
-        if filter_condition:
-            filter_str = filter_condition.replace('@', f"`{column}`")
-            df = df.query(filter_str)
+        # if filter_condition:
+        #     filter_str = filter_condition.replace('@', f"`{column}`")
+        #     df = df.query(filter_str)
         
-        # Apply expression if present
-        if expression:
-            expression_str = expression.replace('@', f"`{column}`")
-            df[column] = df.eval(expression_str)
+        # # Apply expression if present
+        # if expression:
+        #     expression_str = expression.replace('@', f"`{column}`")
+        #     df[column] = df.eval(expression_str)
         
-        # Apply value if present
-        if value is not None:
-            dtype = df[column].dtype  # Get the dtype of the column
-            df[column] = df[column].apply(lambda x: dtype.type(value))
+        # # Apply value if present
+        # if value is not None:
+        #     dtype = df[column].dtype  # Get the dtype of the column
+        #     df[column] = df[column].apply(lambda x: dtype.type(value))
         
         # Process sub operations recursively
-        if sub_operations:
-            for sub_operation in sub_operations:
-                df = self.apply_operation(df, sub_operation)
-        return df
+        # if sub_operations:
+        #     for sub_operation in sub_operations:
+        #         df = self.apply_operation(df, sub_operation)
+        # return df
 
     async def use_filter(self, data, sub, df_name='filter', df_real=None):
         df = df_real
@@ -93,8 +131,7 @@ class Table:
         try:
             for configuration in data:
                 column = configuration['column']
-                for operation in configuration['operations']:
-                    df = self.apply_operation(df, column, operation)
+                df = self.apply_operation(df, column, configuration['operations'])
         except Exception as e:
             print(e)
         read_data.set_df(sub, df_name, df)

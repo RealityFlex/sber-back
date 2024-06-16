@@ -476,6 +476,7 @@ async def start_distribution(
         res = requests.get(f'http://62.109.8.64:8288/distributed_bills?id_distr_returnable={conf["config_id"]}&user_name={sub}&bills_link={"Hey"}')
         if res.status_code == 200:
            db.update_distribution_task_id(conf['config_id'], res.json()['task_id'])
+           db.update_distribution_state(conf['config_id'], "PENDING")
            conf = db.get_user_configuration(conf["config_id"])
         return conf
     except Exception as e:
@@ -524,9 +525,11 @@ async def get_distribution(
         if res['status'] == 'PENDING':
             return {"config_id":config_id, "create_at":conf['create_at'], "status":'PENDING', 'data':res['result']}
         elif res['status'] == 'SUCCESS':
+            db.update_distribution_state(conf['config_id'], "SUCCESS")
             db.update_distribution_info(config_id, res['result'])
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
         elif res['status'] == 'FAILURE':
+            db.update_distribution_state(conf['config_id'], "FAILURE")
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
 
         if conf is None:

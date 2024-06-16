@@ -37,7 +37,7 @@ class Configuration(Base):
     owner = relationship('User', back_populates='configurations')
     distribution_task_id = Column(String(100), default=None)
     distribution_info = Column(JSON, default=None)
-
+    state = Column(String(100), default=None)
 
     def as_dict(self):
         return {
@@ -46,7 +46,8 @@ class Configuration(Base):
             'config_data': self.config_data,
             'create_at': self.create_at.isoformat(),
             'distribution_task_id': self.distribution_task_id,
-            'distribution_info': self.distribution_info
+            'distribution_info': self.distribution_info,
+            'state': self.state
         }
 
 
@@ -113,6 +114,18 @@ def update_distribution_info(config_id: UUID, new_info: dict):
     try:
         # Обновление значения distribution_task_id по заданному config_id
         session.query(Configuration).filter(Configuration.config_id == config_id).update({"distribution_info": new_info})
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+def update_distribution_state(config_id: UUID, new_state: dict):
+    session = Session(expire_on_commit=False)
+    try:
+        # Обновление значения distribution_task_id по заданному config_id
+        session.query(Configuration).filter(Configuration.config_id == config_id).update({"state": new_state})
         session.commit()
     except Exception as e:
         session.rollback()
