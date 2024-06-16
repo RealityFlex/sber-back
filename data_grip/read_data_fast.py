@@ -85,20 +85,22 @@ async def upload_tb_df(user, df_name, filename, file):
     df = get_df(user, df_name)
     print("upload", df.head())
     async with ClientSession() as session:
-        t = await mini.list_files('user-tabels', user, df_name)
-        if filename.split('/')[-1] in t:
-            print("File exist")
-            return {"error": "File exist"}
+        t = await mini.list_only_files('user-tabels', user, df_name)
+        print(t)
+        # if filename.split('/')[-1] in t:
+        #     print("File exist")
+        #     return {"error": "File exist"}
 
         await mini.load_data_bytes("user-tabels", filename, file)
-        if filename.endswith('.csv'):
+        if filename.endswith(('.csv', '.CSV')):
             dataframes = pd.read_csv(file)
-        elif filename.endswith(('.xls', '.xlsx')):
+        elif filename.endswith(('.xls', '.xlsx', '.XLSX')):
             dataframes = pd.read_excel(file)
         else:
             return {"error": "Unsupported file format. Only CSV or Excel files are supported."}
 
         if "low.xlsx" in t:
+            print("File deleted")
             await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
             df = dataframes
         else:
