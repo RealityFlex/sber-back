@@ -3,7 +3,7 @@ from email.message import EmailMessage
 import time
 from celery import Celery
 from celery.result import AsyncResult
-from data_grip.utils.tables_fast import Table
+from utils.tables_fast import Table
 import json
 
 tb = Table()

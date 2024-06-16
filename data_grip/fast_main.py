@@ -4,14 +4,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
-from data_grip.utils.tables_fast import Table
+from utils.tables_fast import Table
 from pydantic import BaseModel
 from typing import Union, List, Optional, Annotated, Dict, Any
 # import mini
 import json
-import data_grip.utils.read_data_fast as read_data
+import utils.read_data_fast as read_data
 import asyncio
-import data_grip.utils.db_w as db
+import utils.db_w as db
 import uuid
 import pandas as pd
 from tasks import celery_use_filter, celery_get_rows, celery_get_table, get_res
@@ -269,7 +269,7 @@ async def filterR(
     exp: str = Header(None, description="Параметр заголовка exp"),
     sub: str = Header(None, description="Параметр заголовка sub"),
     data: FilterData = Body(..., description="Список значений для фильтрации"),
-    df_name: str = 'bills_edit'
+    df_name: str = 'bills'
     ):
     """
     Фильтрация данных в указанной таблице для конкретного пользователя.
@@ -286,7 +286,7 @@ async def filterR(
         read_data.add_user(exp, sub)
         task_id = str(uuid.uuid4())
         tasks[task_id] = {"status": "in_progress", "result": None}
-
+        df_name = df_name + "_edit"
         async def task_wrapper():
             try:
                 # Преобразование данных перед фильтрацией

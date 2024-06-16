@@ -1,6 +1,6 @@
 import pandas as pd
-import mini
-import data_grip.utils.read_data_fast as read_data
+import utils.mini_fast as mini
+import utils.read_data_fast as read_data
 import os
 import asyncio
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 import time
-import data_grip.utils.mini_fast as mini
+import utils.mini_fast as mini
 import asyncio
 import aiofiles
 import io
