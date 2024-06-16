@@ -126,6 +126,12 @@ def set_df(user, table, df):
     else:
         users[user] = {table: df}
 
+def get_conf(user, table):
+    if user in users:
+        return users[user][table]
+    else:
+        return None
+
 def remove_expired_users():
     current_time = int(time.time())
     expired_users = [user for user, data in users.items() if data['exp'] is not None and data['exp'] < current_time]

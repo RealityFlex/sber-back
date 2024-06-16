@@ -308,6 +308,7 @@ async def filterR(
                 tasks[task_id]["status"] = "failed"
                 tasks[task_id]["result"] = str(e)
         
+        read_data.set_df(sub, 'config', data.dict())
         asyncio.create_task(task_wrapper())
 
         return {"message": "Задача улетела", 'id': task_id}
@@ -390,7 +391,7 @@ async def delT(
 async def add_config(
     exp: str = Header(None, description="Параметр заголовка exp"),
     sub: str = Header(None, description="Параметр заголовка sub"),
-    data: dict = Body(..., description="Данные конфигурации")
+    data: FilterData = Body(..., description="Список значений для фильтрации")
 ):
     """
     Добавление новой конфигурации для указанного пользователя.
@@ -404,7 +405,8 @@ async def add_config(
     """
     try:
         read_data.add_user(exp, sub)
-        conf = db.add_new_configuration(sub, data)
+        conf_json = data.dict()
+        conf = db.add_new_configuration(sub, conf_json)
         return conf
     
     except Exception as e:
@@ -434,8 +436,21 @@ async def get_history(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при получении истории конфигураций: {e}")
 
+@app.get('/api/distribution/start')
+async def start_distribution( 
+    exp: str = Header(None, description="Параметр заголовка exp"),
+    sub: str = Header(None, description="Параметр заголовка sub")
+    ):
+    conf = read_data.get_conf(sub, "config")
+    try:
+        read_data.add_user(exp, sub)
+        conf = db.add_new_configuration(sub, conf)
+        return conf
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при добавлении конфигурации: {e}")
+
 @app.get('/api/distribution/{config_id}', summary='Получение конфигурации пользователя по ID', tags=["Получение данных"])
-async def get_history(
+async def get_distribution(
     exp: str = Header(None, description="Параметр заголовка exp"),
     sub: str = Header(None, description="Параметр заголовка sub"),
     config_id: str = None
@@ -461,6 +476,10 @@ async def get_history(
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при получении конфигурации: {e}")
+
+@app.post("/api/distribution/result")
+def distribution_result():
+    pass
 
 @app.get('/api/tables/task_status/{task_id}', summary='Получение статуса операции Celery по ID', tags=["Проверка статуса операций"])
 async def task_status(task_id: str):
