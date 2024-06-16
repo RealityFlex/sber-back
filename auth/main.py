@@ -12,7 +12,7 @@ from pydantic import BaseModel
 HeaderParameter = Annotated[Union[str, None], Header()]
 
 # from replit import db
-from utils.utils import (
+from utils.utils_auth import (
     get_hashed_password,
     create_access_token,
     create_refresh_token,

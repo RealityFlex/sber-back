@@ -2,7 +2,7 @@ from typing import Union, Any
 from datetime import datetime
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from utils import (
+from utils.utils_auth import (
     ALGORITHM,
     PUBLIC_KEY,
     JWT_SECRET_KEY,
@@ -11,8 +11,8 @@ from utils import (
 
 from jose import jwt
 from pydantic import ValidationError
-from schemas import TokenPayload, SystemUser
-import db_w as db
+from utils.schemas import TokenPayload, SystemUser
+import utils.db_w as db
 # from replit import db
 
 reuseable_oauth = OAuth2PasswordBearer(
