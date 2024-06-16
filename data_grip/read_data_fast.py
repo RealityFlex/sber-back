@@ -50,7 +50,7 @@ def get_df(user, df_name):
     
 async def load_df(user, df_name):
     df = pd.DataFrame()
-    arr = ['list_contracts.xlsx','main_assets.xlsx',' service_codes.xlsx']
+    arr = ['contracts_relationship.XLSX','main_assets.xlsx','service_codes.xlsx']
     async with ClientSession() as session:
         file_list = await mini.list_only_files('user-tabels', user, df_name)
         if len(file_list) == 0:
