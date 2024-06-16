@@ -60,7 +60,7 @@ async def load_df(user, df_name):
         hard_list = await mini.list_only_files('user-tabels', user, "hardcoded")
         for i in arr:
             if not i in hard_list:
-                await mini.copy('user-tabels', f'{user}/{df_name}/{i}', 'user-tabels', 'Default-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/hardcoded/{i}')
+                await mini.copy('user-tabels', f'{user}/{"hardcoded"}/{i}', 'user-tabels', f'Default-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/hardcoded/{i}')
         
         tasks = []
         for file in file_list:
