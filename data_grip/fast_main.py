@@ -269,7 +269,7 @@ async def filterR(
     exp: str = Header(None, description="Параметр заголовка exp"),
     sub: str = Header(None, description="Параметр заголовка sub"),
     data: FilterData = Body(..., description="Список значений для фильтрации"),
-    df_name: str = 'bills'
+    df_name: str = 'bills_edit'
     ):
     """
     Фильтрация данных в указанной таблице для конкретного пользователя.
@@ -286,7 +286,7 @@ async def filterR(
         read_data.add_user(exp, sub)
         task_id = str(uuid.uuid4())
         tasks[task_id] = {"status": "in_progress", "result": None}
-        df_name = df_name + "_edit"
+
         async def task_wrapper():
             try:
                 # Преобразование данных перед фильтрацией
