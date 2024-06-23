@@ -106,7 +106,9 @@ async def getT(
     df_name = df_name+"_edit"
     df = read_data.get_df(sub, df_name)
     if df.empty:
-        return "Таблица не загружена"
+        return {
+                    data: []
+                }
     else:
         total_rows = len(df)
         total_pages = (total_rows) // n
