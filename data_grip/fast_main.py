@@ -328,7 +328,7 @@ async def filterR(
             try:
                 # Преобразование данных перед фильтрацией
                 filter_data = [conf.dict() for conf in data.configurations]
-                result = await tb.use_filter(data=filter_data, sub=sub, df_name="filter", df_real=read_data.get_df(sub, df_name))
+                result = await tb.use_filter(data=filter_data, sub=sub, df_name="filter", df_real=read_data.get_df(sub, 'bills_edit'))
                 tasks[task_id]["status"] = "completed"
                 tasks[task_id]["result"] = result
             except Exception as e:

@@ -59,50 +59,75 @@ class Table:
                 df = read_data.load_df(sub, df_name)
         read_data.add_user_table(sub,df_name,df)
     
-    def apply_operation(self, df, column, operations):
-        try:
-            for operation in operations:
-                print(f"Operation: {operation}")
-                value = operation.get('value')
-                filter_condition = operation.get('filter')
-                expression = operation.get('expression')
+    def apply_operation(self, df, column, operation):
+        value = operation.get('value')  
+        filter_condition = operation.get('filter')
+        expression = operation.get('expression')
 
-                if filter_condition:
-                    try:
-                        filter_str = filter_condition.replace('@', f"`{column}`")
-                        print(f"Applying filter: {filter_str}")
-                        df = df.query(filter_str)
-                        print(f"Filtered DataFrame:\n{df.head()}")
-                    except Exception as e:
-                        print(f"Error applying filter: {e}")
-                        continue  # Move to the next operation
-
-                if expression:
-                    try:
-                        expression_str = expression.replace('@', f"`{column}`")
-                        print(f"Applying expression: {expression_str}")
-                        df[column] = df.eval(expression_str)
-                        print(f"DataFrame after expression:\n{df.head()}")
-                    except Exception as e:
-                        print(f"Error applying expression: {e}")
-                        continue  # Move to the next operation
-
-                if value:
-                    try:
-                        dtype = df[column].dtype
-                        df[column] = df[column].apply(lambda x: dtype.type(value))
-                        print(f"DataFrame after applying value:\n{df.head()}")
-                    except Exception as e:
-                        print(f"Error applying value: {e}")
-                        continue  # Move to the next operation
-
-            return df
-
-        except Exception as e:
-            print(f"Unexpected error in apply_operation: {e}")
+        # Apply filter if present
+        if filter_condition:
+            filter_str = f"`{column}` {filter_condition}"
+            df = df.query(filter_str)
         
-        except Exception as e:
-            print(e)
+        # Apply expression if present
+        if expression:
+            expression_str = f"{column} {expression}"
+            df[column] = df.eval(expression_str)
+        
+        # Apply value if present
+        if value is not None:
+            dtype = df[column].dtype  # Get the dtype of the column
+            df[column] = df[column].apply(lambda x: dtype.type(value))
+
+        return df  # Ensure you return the modified DataFrame
+
+    
+    # def apply_operation(self, df, column, operations):
+    #     try:
+    #         for operation in operations:
+    #             print(f"Operation: {operation}")
+    #             value = operation.get('value')
+    #             filter_condition = operation.get('filter')
+    #             expression = operation.get('expression')
+
+    #             if filter_condition:
+    #                 try:
+    #                     if "@" in filter_condition:
+    #                         filter_condition = filter_condition.replace('@', f"`{column}`")
+    #                     print(f"Applying filter: {filter_condition}")
+    #                     df = df.query(filter_condition)
+    #                     print(f"Filtered DataFrame:\n{df.head()}")
+    #                 except Exception as e:
+    #                     print(f"Error applying filter: {e}")
+    #                     continue  # Move to the next operation
+
+    #             if expression:
+    #                 try:
+    #                     if "@" in expression:
+    #                         expression = expression.replace('@', f"`{column}`")
+    #                     print(f"Applying expression: {expression}")
+    #                     df[column] = df.eval(expression)
+    #                     print(f"DataFrame after expression:\n{df.head()}")
+    #                 except Exception as e:
+    #                     print(f"Error applying expression: {e}")
+    #                     continue  # Move to the next operation
+
+    #             if value:
+    #                 try:
+    #                     dtype = df[column].dtype
+    #                     df[column] = df[column].apply(lambda x: dtype.type(value))
+    #                     print(f"DataFrame after applying value:\n{df.head()}")
+    #                 except Exception as e:
+    #                     print(f"Error applying value: {e}")
+    #                     continue  # Move to the next operation
+
+    #         return df
+
+    #     except Exception as e:
+    #         print(f"Unexpected error in apply_operation: {e}")
+        
+    #     except Exception as e:
+    #         print(e)
         # Apply filter if present
         # if filter_condition:
         #     filter_str = filter_condition.replace('@', f"`{column}`")
@@ -126,12 +151,15 @@ class Table:
 
     async def use_filter(self, data, sub, df_name='filter', df_real=None):
         df = df_real
-        read_data.set_df(sub, df_name, pd.DataFrame())
-        read_data.set_df(sub, df_name + "_edit", pd.DataFrame())
+        # read_data.set_df(sub, df_name, pd.DataFrame())
+        # read_data.set_df(sub, df_name + "_edit", pd.DataFrame())
         try:
             for configuration in data:
+                print(configuration)
                 column = configuration['column']
-                df = self.apply_operation(df, column, configuration['operations'])
+                for operation in configuration['operations']:
+                    print(operation)
+                    df = self.apply_operation(df, column, operation)
         except Exception as e:
             print(e)
         read_data.set_df(sub, df_name, df)
