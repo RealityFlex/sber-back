@@ -71,7 +71,7 @@ class Table:
         
         # Apply expression if present
         if expression:
-            expression_str = f"{column} {expression}"
+            expression_str = f"`{column}` {expression}"
             df[column] = df.eval(expression_str)
         
         # Apply value if present

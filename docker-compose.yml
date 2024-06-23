@@ -9,8 +9,8 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8001
     ports:
       - 8188:8001
-    networks:
-      - sber-network
+    # networks:
+    #   - sber-network
       
   data_grip:
     build: ./data_grip
@@ -19,8 +19,8 @@ services:
     command: uvicorn fast_main:app --host 0.0.0.0
     ports:
       - 8180:8000
-    networks:
-      - sber-network
+    # networks:
+    #   - sber-network
 
   krakend:
     container_name: krakend
@@ -28,13 +28,13 @@ services:
     restart: always
     ports:
       - "8190:8090"
-    networks:
-      - sber-network
+#     networks:
+#       - sber-network
 
-networks:
-  sber-network:
-    driver: bridge
-  # db:
+# networks:
+#   sber-network:
+#     driver: bridge
+#   # db:
   #   restart: always
   #   image: postgres:11.11
   #   # Внешний том(volume) и место где он будет подключен внутри контейнера
