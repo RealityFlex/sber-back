@@ -107,7 +107,7 @@ async def getT(
     df = read_data.get_df(sub, df_name)
     if df.empty:
         return {
-                    data: []
+                    "data": []
                 }
     else:
         total_rows = len(df)
