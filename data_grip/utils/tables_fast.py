@@ -36,7 +36,9 @@ class Table:
                 print(">>>")
                 df = read_data.load_df(sub, df_name)
         if df.empty:
-            return "Таблица не загружена"
+            return {
+                    "data": []
+                    }
         if n == 0 and pg == 0:
             os.makedirs(f"../data_tables/{sub}", exist_ok=True)
             df.to_excel(f"../data_tables/{sub}/{df_name}.xlsx")
