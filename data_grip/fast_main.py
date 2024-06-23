@@ -475,9 +475,11 @@ async def start_distribution(
         conf = db.add_new_configuration(sub, conf_json)
         res = requests.get(f'http://62.109.8.64:8288/distributed_bills?id_distr_returnable={conf["config_id"]}&user_name={sub}&bills_link={"Hey"}')
         if res.status_code == 200:
-           db.update_distribution_task_id(conf['config_id'], res.json()['task_id'])
-           db.update_distribution_state(conf['config_id'], "PENDING")
-           conf = db.get_user_configuration(conf["config_id"])
+            res = res.json()
+            print("DATA", res)
+            db.update_distribution_task_id(conf['config_id'], res['task_id'])
+            db.update_distribution_state(conf['config_id'], "PENDING")
+            conf = db.get_user_configuration(conf["config_id"])
         return conf
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при добавлении конфигурации: {e}")

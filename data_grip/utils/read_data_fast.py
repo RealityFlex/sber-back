@@ -72,6 +72,7 @@ async def load_df(user, df_name):
 
         # Конкатенируем все полученные DataFrame
         df = pd.concat(dataframes, ignore_index=True)
+        await save_df_to_minio(user, 'filter', df)
 
     df.replace([float('inf'), float('-inf'), float('nan')], 0, inplace=True)
     if user not in users:
@@ -106,6 +107,7 @@ async def upload_tb_df(user, df_name, filename, file):
         else:
         # Конкатенируем все полученные DataFrame
             df = pd.concat([df, dataframes], ignore_index=True)
+        await save_df_to_minio(user, 'filter', df)
         print(df.info())
 
     df.replace([float('inf'), float('-inf'), float('nan')], 0, inplace=True)
