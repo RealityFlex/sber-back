@@ -458,6 +458,26 @@ async def get_history(
         conf = db.get_user_configurations(sub)
         if conf is None:
             return {"message": "Конфигурации не найдены"}
+        for i in conf:
+            # if conf['distribution_info'] != None:
+            #     return {"config_id":config_id, "create_at":conf['create_at'], "status":"SUCSESS", 'data':conf['distribution_info']}
+            conf_id = i.as_dict()['config_id']
+            conf_task = i.as_dict()['distribution_task_id']
+            print(conf_id)
+            try:
+                res = requests.get(f'http://62.109.8.64:8288/task_status/{conf_task}').json()
+                if res['status'] == 'PENDING':
+                    db.update_distribution_state(conf_id, "PENDING")
+                    db.update_distribution_info(conf_id, res['result'])
+                elif res['status'] == 'SUCCESS':
+                    db.update_distribution_state(conf_id, "SUCCESS")
+                    db.update_distribution_info(conf_id, res['result'])
+                elif res['status'] == 'FAILURE':
+                    db.update_distribution_state(conf_id, "FAILURE")
+                    db.update_distribution_info(conf_id, res['result'])
+            except Exception as e:
+                print(e)
+        conf = db.get_user_configurations(sub)
         return conf
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при получении истории конфигураций: {e}")
@@ -520,7 +540,7 @@ async def get_distribution(
         print(conf)
 
         if conf['distribution_info'] != None:
-            return {"config_id":config_id, "create_at":conf['create_at'], "status":"sucsess", 'data':conf['distribution_info']}
+            return {"config_id":config_id, "create_at":conf['create_at'], "status":"SUCCESS", 'data':conf['distribution_info']}
 
         res = requests.get(f'http://62.109.8.64:8288/task_status/{conf["distribution_task_id"]}').json()
         print(res)

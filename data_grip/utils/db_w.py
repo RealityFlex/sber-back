@@ -116,6 +116,7 @@ def update_distribution_info(config_id: UUID, new_info: dict):
         session.query(Configuration).filter(Configuration.config_id == config_id).update({"distribution_info": new_info})
         session.commit()
     except Exception as e:
+        print(e)
         session.rollback()
         raise
     finally:
