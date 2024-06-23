@@ -86,6 +86,7 @@ async def get_distr_tb(user, df_name, link):
     df = pd.read_excel(link)
     users[user][df_name] = df
     users[user][f"{df_name}_edit"] = df
+    print("distr", df.head())
 
 async def upload_tb_df(user, df_name, filename, file):
     df = get_df(user, df_name)
