@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, JSON
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, create_engine, ForeignKeyConstraint, \
@@ -19,7 +19,7 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     username = Column(String(100), nullable=False, default=None)
     token_password = Column(String(100), nullable=False, default=None)
-    register_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    register_at = Column(DateTime(timezone=True), nullable=False, default=datetime.now(tz))
     img_url = Column(String(100), default=None)
 
     configurations = relationship('Configuration', back_populates='owner')
@@ -34,7 +34,7 @@ class Configuration(Base):
     config_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(UUID, ForeignKey('user.id'), nullable=False)
     config_data = Column(JSON, nullable=False)
-    create_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    create_at = Column(DateTime, nullable=False, default=datetime.now())
     owner = relationship('User', back_populates='configurations')
     distribution_task_id = Column(String(100), default=None)
     distribution_info = Column(JSON, default=None)
