@@ -7,9 +7,10 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, create_eng
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+import pytz
 
 Base = declarative_base()
-
+tz = pytz.timezone('Europe/Moscow')
 docker_ip = "62.109.8.64"
 docker_port = 9559
 
@@ -58,7 +59,7 @@ Base.metadata.create_all(engine)
 
 def add_new_user(username: str, token_password: str, img_url: str = None):
     session = Session()
-    user = User(username=username, register_at=datetime.now(), img_url=img_url, token_password=token_password)
+    user = User(username=username, register_at=datetime.now(tz), img_url=img_url, token_password=token_password)
     session.add(user)
     session.commit()
     session.close()
