@@ -87,7 +87,7 @@ def add_new_configuration(username: str, config_data: dict):
 def get_user_configurations(username: str):
     session = Session(expire_on_commit=False)
     user = session.query(User).filter(User.username == username).first()
-    configurations = session.query(Configuration).filter(Configuration.user_id == user.id).all()
+    configurations = session.query(Configuration).filter(Configuration.user_id == user.id).order_by(desc(Configuration.create_at)).all()
     session.close()
     return configurations
 

@@ -540,8 +540,8 @@ async def get_distribution(
         print(conf)
 
         if conf['distribution_info'] != None:
+            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
             return {"config_id":config_id, "create_at":conf['create_at'], "status":"SUCCESS", 'data':conf['distribution_info']}
-
         res = requests.get(f'http://62.109.8.64:8288/task_status/{conf["distribution_task_id"]}').json()
         print(res)
         if res['status'] == 'PENDING':
