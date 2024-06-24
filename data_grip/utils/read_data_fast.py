@@ -53,9 +53,9 @@ async def load_df(user, df_name):
     arr = ['contracts_relationship.XLSX','main_assets.xlsx','service_codes.xlsx']
     async with ClientSession() as session:
         file_list = await mini.list_only_files('user-tabels', user, df_name)
-        if len(file_list) == 0:
-            await mini.copy('user-tabels', f'{user}/{df_name}/low.xlsx', 'user-tabels', 'Default-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/bills/low_data.xlsx')
-            file_list = await mini.list_only_files('user-tabels', user, df_name)
+        # if len(file_list) == 0:
+        #     await mini.copy('user-tabels', f'{user}/{df_name}/low.xlsx', 'user-tabels', 'Default-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/bills/low_data.xlsx')
+        #     file_list = await mini.list_only_files('user-tabels', user, df_name)
 
         hard_list = await mini.list_only_files('user-tabels', user, "hardcoded")
         for i in arr:
@@ -106,13 +106,13 @@ async def upload_tb_df(user, df_name, filename, file):
         else:
             return {"error": "Unsupported file format. Only CSV or Excel files are supported."}
 
-        if "low.xlsx" in t:
-            print("File deleted")
-            await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
-            df = dataframes
-        else:
+        # if "low.xlsx" in t:
+        #     print("File deleted")
+        #     await mini.delete_file("user-tabels", f"{user}/{df_name}/low.xlsx")
+        #     df = dataframes
+        # else:
         # Конкатенируем все полученные DataFrame
-            df = pd.concat([df, dataframes], ignore_index=True)
+        df = pd.concat([df, dataframes], ignore_index=True)
         await save_df_to_minio(user, 'filter', df)
         print(df.info())
 
