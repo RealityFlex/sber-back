@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status, HTTPException, Depends, Body, Request
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from utils.schemas import UserOut, UserAuth, TokenSchema, SystemUser
@@ -39,9 +40,9 @@ def get_jwk():
 async def create_user(data: UserAuth):
     user = db.get_user(data.username)
     if user is not None:
-            raise HTTPException(
+            return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Пользователь уже зарегистрирован"}
+            content={"message": f"Пользователь с таким именем уже зарегистрирован"}
         )
     user = {
         'username': data.username,
