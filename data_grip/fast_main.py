@@ -556,7 +556,7 @@ async def get_distribution(
         if res['status'] == 'PENDING':
             return {"config_id":config_id, "create_at":conf['create_at'], "status":'PENDING', 'data':res['result']}
         elif res['status'] == 'SUCCESS':
-            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
+            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', res['result']['distributed_bills']))
             db.update_distribution_state(conf['config_id'], "SUCCESS")
             db.update_distribution_info(config_id, res['result'])
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
