@@ -549,13 +549,14 @@ async def get_distribution(
 
         if conf['distribution_info'] != None and conf['state'] == 'SUCCESS':
             # asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
-            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', "http://62.109.8.64:9090/api/v1/download-shared-object/http:%2F%2Flocalhost:9000%2Fuser-tabels%2Fqwe%2Fresult%2Fdistributed_bills.xlsx%3FX-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=2E38QJKPGOM5F3U8NDBL%252F20240623%252Fus-east-1%252Fs3%252Faws4_request&X-Amz-Date=20240623T113410Z&X-Amz-Expires=43200&X-Amz-Security-Token=eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NLZXkiOiIyRTM4UUpLUEdPTTVGM1U4TkRCTCIsImV4cCI6MTcxOTE4NDgzOSwicGFyZW50IjoicnR1aXRsYWIifQ.6yvOHb6ibqq26zv1g64rZZUhrnj7Y-k7xxz79g0ZeekvbBLU1Z-Zbwh2QEPTpvMVCNrK8LJCEzDLUtG5TvPObA&X-Amz-SignedHeaders=host&versionId=null&X-Amz-Signature=91e3c13fafc4548726ef50e88cda63cdfe765e6064323d644dae068f05f9ceab"))
+            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
             return {"config_id":config_id, "create_at":conf['create_at'], "status":"SUCCESS", 'data':conf['distribution_info']}
         res = requests.get(f'http://62.109.8.64:8288/task_status/{conf["distribution_task_id"]}').json()
         print(res)
         if res['status'] == 'PENDING':
             return {"config_id":config_id, "create_at":conf['create_at'], "status":'PENDING', 'data':res['result']}
         elif res['status'] == 'SUCCESS':
+            asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
             db.update_distribution_state(conf['config_id'], "SUCCESS")
             db.update_distribution_info(config_id, res['result'])
             return {"config_id":config_id, "create_at":conf['create_at'], "status":res['status'], 'data':res['result']}
