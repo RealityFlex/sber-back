@@ -97,7 +97,7 @@ async def upload_tb_df(user, df_name, filename, file):
         # if filename.split('/')[-1] in t:
         #     print("File exist")
         #     return {"error": "File exist"}
-
+        arr = ['contracts_relationship.XLSX','main_assets.xlsx','service_codes.xlsx']
         await mini.load_data_bytes("user-tabels", filename, file)
         if filename.endswith(('.csv', '.CSV')):
             dataframes = pd.read_csv(file)
@@ -105,6 +105,11 @@ async def upload_tb_df(user, df_name, filename, file):
             dataframes = pd.read_excel(file)
         else:
             return {"error": "Unsupported file format. Only CSV or Excel files are supported."}
+
+        hard_list = await mini.list_only_files('user-tabels', user, "hardcoded")
+        for i in arr:
+            if not i in hard_list:
+                await mini.copy('user-tabels', f'{user}/{"hardcoded"}/{i}', 'user-tabels', f'Default-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/hardcoded/{i}')
 
         # if "low.xlsx" in t:
         #     print("File deleted")
