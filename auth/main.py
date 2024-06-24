@@ -57,16 +57,16 @@ async def create_user(data: UserAuth):
 async def login(userr: UserAuth):
     user = db.get_user(userr.username)
     if user is None:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
+            content={"message": f"Неверный логин или пароль"}
         )
     user = user.as_dict()
     hashed_pass = user['token_password']
     if not verify_password(userr.password, hashed_pass):
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
+            content={"message": f"Неверный логин или пароль"}
         )
     
     return {
