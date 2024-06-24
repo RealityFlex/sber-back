@@ -547,7 +547,7 @@ async def get_distribution(
         conf = db.get_user_configuration(config_id).as_dict()
         print(conf)
 
-        if conf['distribution_info'] != None and conf['state'] == 'SUCCESS':
+        if type(conf['distribution_info']) == dict and conf['state'] == 'SUCCESS':
             # asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
             asyncio.create_task(read_data.get_distr_tb(sub, 'distr', conf['distribution_info']['distributed_bills']))
             return {"config_id":config_id, "create_at":conf['create_at'], "status":"SUCCESS", 'data':conf['distribution_info']}
