@@ -41,7 +41,7 @@ async def create_user(data: UserAuth):
     if user is not None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exist"
+            content={"message": "Пользователь уже зарегистрирован"}
         )
     user = {
         'username': data.username,
